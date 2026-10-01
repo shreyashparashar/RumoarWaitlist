@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="gated">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -26,35 +26,12 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 html{background:#000}
-html.gated,html.gated body{overflow:hidden}
 body{margin:0;background:#000;color:var(--silver);font-family:var(--sans);-webkit-font-smoothing:antialiased}
 #stage{position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;display:block}
 .track{height:620vh}
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid #fff;outline-offset:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-
-/* ---------- Entry: the lights are off until you step in ---------- */
-.gate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;
-  padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));
-  background:radial-gradient(90% 70% at 50% 50%,rgba(0,0,0,.35),rgba(0,0,0,.9) 75%);
-  transition:opacity 1.4s cubic-bezier(.4,0,.2,1),visibility 0s linear 1.4s}
-.gate.is-gone{opacity:0;visibility:hidden;pointer-events:none}
-.gate-in{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:34rem}
-.gate-mark{margin:0;font:400 13px/1 var(--logo);letter-spacing:.34em;padding-left:.34em;color:var(--silver)}
-.gate-load{width:96px;height:1px;margin:22px 0 34px;background:rgba(255,255,255,.12);overflow:hidden}
-.gate-load i{display:block;height:100%;background:var(--silver-2);transform-origin:left;transform:scaleX(0);transition:transform .4s ease}
-.gate-line{margin:0 0 38px;font:italic 400 clamp(32px,6.4vw,52px)/1.06 var(--serif);color:var(--warm);letter-spacing:-.01em;text-wrap:balance;
-  animation:breathe 7s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:.62;text-shadow:0 0 16px rgba(236,226,208,.08)}50%{opacity:1;text-shadow:0 0 36px rgba(236,226,208,.28)}}
-.gate-go{height:52px;padding:0 28px;border-radius:999px;border:1px solid rgba(236,226,208,.42);background:rgba(236,226,208,.05);color:#f3eee5;
-  font:500 15px/1 var(--sans);letter-spacing:.01em;cursor:pointer;transition:background .3s,border-color .3s}
-.gate-go:hover{background:rgba(236,226,208,.12);border-color:rgba(236,226,208,.7)}
-.gate-quiet{margin-top:10px;height:44px;padding:0 14px;border:0;background:none;color:var(--silver-2);font:400 14px/1 var(--sans);cursor:pointer;
-  text-decoration:underline;text-decoration-color:rgba(169,172,178,.4);text-underline-offset:4px}
-.gate-quiet:hover{color:var(--silver)}
-.gate-clock{margin:34px 0 0;font:400 13px/1 var(--sans);color:var(--silver-2);font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.gate-clock b{font-weight:500;color:var(--silver)}
 
 /* ---------- Top bar ---------- */
 .bar{position:fixed;top:0;left:0;right:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"mark clock actions";align-items:center;column-gap:16px;
@@ -68,14 +45,20 @@ body{margin:0;background:#000;color:var(--silver);font-family:var(--sans);-webki
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--silver);cursor:pointer;transition:background .25s,border-color .25s}
 .pill:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
 .cta-top{padding:0 20px;font:500 14px/1 var(--sans)}
-.snd{width:44px;display:grid;place-items:center;padding:0}
-.eq{display:flex;align-items:center;gap:2.5px;height:14px}
-.eq i{display:block;width:2px;height:3px;border-radius:1px;background:currentColor;opacity:.75}
-.snd[aria-pressed="true"] .eq i{opacity:1;animation:eq 1.2s ease-in-out infinite}
-.snd[aria-pressed="true"] .eq i:nth-child(2){animation-delay:-.45s}
-.snd[aria-pressed="true"] .eq i:nth-child(3){animation-delay:-.9s}
-.snd[aria-pressed="true"] .eq i:nth-child(4){animation-delay:-.2s}
-@keyframes eq{0%,100%{height:3px}50%{height:14px}}
+/* Sound: a thread of a waveform that breathes with the music and lies flat when hushed */
+.hush{position:fixed;z-index:25;right:max(18px,env(safe-area-inset-right,0px));top:50%;translate:0 -50%;
+  width:44px;height:44px;padding:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--warm);
+  border:1px solid rgba(236,226,208,.26);background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 0 calc(6px + var(--glow,0)*26px) rgba(236,226,208,calc(.05 + var(--glow,0)*.22));
+  opacity:0;transition:opacity 1.2s ease .4s,border-color .3s}
+.hush.is-on{opacity:1}
+.hush:hover{border-color:rgba(236,226,208,.55)}
+.hush svg{width:28px;height:28px;overflow:visible}
+.hush path{fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.hush[aria-pressed="true"]{border-color:rgba(236,226,208,.16);color:rgba(236,226,208,.6)}
+.hush-tip{position:absolute;right:calc(100% + 14px);top:50%;translate:0 -50%;white-space:nowrap;pointer-events:none;
+  font:italic 400 18px/1 var(--serif);color:var(--warm);opacity:0;transition:opacity .35s}
+.hush:hover .hush-tip,.hush:focus-visible .hush-tip{opacity:.9}
 .skip{position:fixed;left:16px;top:16px;z-index:70;transform:translateY(-220%);background:#fff;color:#000;padding:12px 16px;border-radius:10px;font:600 14px var(--sans)}
 .skip:focus{transform:none}
 
@@ -171,41 +154,33 @@ input[aria-invalid="true"]{box-shadow:inset 0 3px 8px rgba(0,0,0,.85),0 0 0 2px 
   /* whispers sit low, like subtitles, so the bag owns the middle of the screen */
   .whisper{font-size:31px;text-align:center}
   .w1,.w2,.w3{top:auto;bottom:calc(12vh + env(safe-area-inset-bottom,0px));left:50%;right:auto;translate:-50% 0;width:86vw;max-width:none}
-  .card{left:20px;right:20px}
+  .card{left:20px;right:76px}
+  .hush{top:auto;bottom:calc(18px + env(safe-area-inset-bottom,0px));right:16px;translate:none}
+  .hush-tip{display:none}
   .card h2{font-size:44px}
 }
 @media (prefers-reduced-motion: reduce){
   .tag,.tilt{transition:none}.box.shine .front::before{animation:none}
-  .gate-line,.snd[aria-pressed="true"] .eq i{animation:none}
-  .snd[aria-pressed="true"] .eq i{height:9px}
-  .gate{transition-duration:.3s}
 }
 </style>
-<noscript><style>html.gated,html.gated body{overflow:auto}.gate{display:none}.box{opacity:1!important;visibility:visible!important;transform:translate(-50%,-50%)!important}.track{height:100vh}.clock,.bar-clock,.snd{display:none}</style></noscript>
+<noscript><style>.box{opacity:1!important;visibility:visible!important;transform:translate(-50%,-50%)!important}.track{height:100vh}.clock,.bar-clock,.hush{display:none}</style></noscript>
 </head>
 <body>
 <a class="skip" href="#waitlist" id="skip">Skip to the waitlist</a>
 <canvas id="stage" aria-label="A black RUMOAR leather bag, seen from above as the camera circles down to the zipper pull stamped RUMOAR" role="img"></canvas>
 
-<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateLine">
-  <div class="gate-in">
-    <p class="gate-mark" aria-hidden="true">RUMOAR</p>
-    <div class="gate-load" aria-hidden="true"><i id="gateLoad"></i></div>
-    <p class="gate-line" id="gateLine">Some things are only passed on quietly.</p>
-    <button class="gate-go" type="button" id="enterSound">Enter with sound</button>
-    <button class="gate-quiet" type="button" id="enterQuiet">Enter without sound</button>
-    <p class="gate-clock" id="gateClock">The first drop opens in <b id="gateT">--</b></p>
-  </div>
-</div>
-
 <header class="bar" id="bar">
   <a class="mark" href="#top" id="toTop" aria-label="RUMOAR, back to top">RUMOAR</a>
   <p class="bar-clock" id="barClock" aria-hidden="true">Drops in <b id="barT">--</b></p>
   <div class="actions">
-    <button class="pill snd" type="button" id="snd" aria-pressed="false" aria-label="Music"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
     <button class="pill cta-top" type="button" id="jump">Join the waitlist</button>
   </div>
 </header>
+
+<button class="hush" id="hush" type="button" aria-pressed="false" aria-label="Mute sound">
+  <svg viewBox="0 0 28 28" aria-hidden="true"><path id="wave" d="M3 14H25"/></svg>
+  <span class="hush-tip" id="hushTip" aria-hidden="true">Hush</span>
+</button>
 
 <div class="story">
   <p class="whisper w1 fx" id="w1">Keep this between us.</p>
@@ -267,7 +242,7 @@ const SUPABASE_URL = 'https://byxiqtdimqiocitylrzr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_LVceKQRffzZkwfwG9AH5xQ_jXwHif9q'; // publishable key, safe in a website
 
 // When the first drop opens. Keep the timezone offset so it's the same moment everywhere.
-const DROP_AT = '2026-11-20T19:00:00+05:30';
+const DROP_AT = '2026-10-05T00:00:00+05:30';
 
 // Starting number added to the real sign-up count (needs the waitlist_count function in Supabase).
 // Set to 0 to show the true number.
@@ -305,12 +280,14 @@ function apiHeaders(extra){ const h=Object.assign({'Content-Type':'application/j
 function fetchT(url,opts,ms){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); return fetch(url,Object.assign({},opts,{signal:c.signal})).finally(()=>clearTimeout(t)); }
 
 /* ---------- music ---------- */
-// Web Audio so the loop crossfades (the track fades out at ~63s) and the sound can be "heard through the wall"
-// at the top of the page, opening up as you scroll closer to the tag.
+// Plays as soon as the page opens wherever the browser allows it. Most browsers hold sound back until the
+// visitor's first tap, click or key press, so it also starts on the very first one of those.
+// Web Audio lets the loop crossfade (the track fades out at ~63s) and lets the sound start muffled,
+// "through the wall", opening up as you scroll closer to the tag.
 const music=(()=>{
   const AC=window.AudioContext||window.webkitAudioContext;
   const LOOP_AT=61.5, XFADE=3;
-  let ctx=null, buf=null, bus, lp, master, an, bins, on=false, started=false, nextAt=0, suspendT=0, lastF=0;
+  let ctx=null, buf=null, bus, lp, master, an, bins, want=true, started=false, faded=false, nextAt=0, suspendT=0, lastF=0;
   function init(){
     if(ctx||!AC) return;
     try{ ctx=new AC(); }catch(e){ console.warn('RUMOAR: audio unavailable',e); return; }
@@ -318,11 +295,13 @@ const music=(()=>{
     lp.type='lowpass'; lp.frequency.value=900; lp.Q.value=0.4; master.gain.value=0;
     an.fftSize=256; an.smoothingTimeConstant=0.55; bins=new Uint8Array(an.frequencyBinCount);
     bus.connect(lp); lp.connect(master); master.connect(an); an.connect(ctx.destination);
+    ctx.onstatechange=go;
     fetch(MUSIC_SRC).then(r=>r.arrayBuffer())
       .then(ab=>new Promise((res,rej)=>ctx.decodeAudioData(ab,res,rej)))
-      .then(b=>{ buf=b; if(on) begin(); })
+      .then(b=>{ buf=b; go(); })
       .catch(e=>console.warn('RUMOAR: music failed to load',e));
     setInterval(()=>{ if(started&&ctx.state==='running'&&ctx.currentTime>nextAt-1.2) queue(false); },400);
+    go();
   }
   function queue(first){
     const src=ctx.createBufferSource(), g=ctx.createGain(); src.buffer=buf;
@@ -331,32 +310,39 @@ const music=(()=>{
     src.onended=()=>{ src.disconnect(); g.disconnect(); };
     src.start(nextAt); nextAt+=LOOP_AT;
   }
-  function begin(){ if(!buf||started||!ctx) return; started=true; nextAt=ctx.currentTime+0.05; queue(true); }
   function ramp(to,secs){ const t=ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value,t); master.gain.linearRampToValueAtTime(to,t+secs); }
-  function enable(){ // call from a click/tap so browsers allow playback
-    init(); if(!ctx) return false;
-    on=true; clearTimeout(suspendT); ctx.resume(); ramp(clamp(MUSIC_VOLUME),2.5); begin(); return true;
+  function go(fadeSecs){ // play if wanted and the browser allows it
+    if(!ctx||!want) return;
+    if(ctx.state!=='running'){ const pr=ctx.resume(); if(pr&&pr.catch) pr.catch(()=>{}); return; }
+    if(!buf) return;
+    if(!started){ started=true; nextAt=ctx.currentTime+0.05; queue(true); }
+    if(!faded){ faded=true; ramp(clamp(MUSIC_VOLUME),typeof fadeSecs==='number'?fadeSecs:3); }
   }
-  function disable(){ if(!ctx) return; on=false; ramp(0,0.7); clearTimeout(suspendT); suspendT=setTimeout(()=>{ if(!on) ctx.suspend(); },800); }
+  function mute(){ if(!ctx) return; want=false; faded=false; ramp(0,0.6); clearTimeout(suspendT); suspendT=setTimeout(()=>{ if(!want) ctx.suspend(); },700); }
+  function unmute(){ want=true; clearTimeout(suspendT); init(); go(1.2); }
   function setDepth(p){ // 0 = muffled, 1 = clear
-    if(!ctx||!on) return;
+    if(!ctx||!want) return;
     const f=700*Math.pow(20000/700,Math.pow(clamp(p),1.5));
     if(Math.abs(f-lastF)/f>0.03){ lastF=f; lp.frequency.setTargetAtTime(f,ctx.currentTime,0.3); }
   }
-  function level(){ // low-end energy, 0..1, or -1 when silent
-    if(!ctx||!on||ctx.state!=='running') return -1;
+  function level(){ // low-end energy 0..1, or -1 when nothing is audible
+    if(!ctx||!want||!started||ctx.state!=='running') return -1;
     an.getByteFrequencyData(bins); let s=0; for(let i=1;i<9;i++) s+=bins[i]; return s/(8*255);
   }
-  document.addEventListener('visibilitychange',()=>{ if(!ctx) return; if(document.hidden) ctx.suspend(); else if(on) ctx.resume(); });
-  return {init,enable,disable,setDepth,level,get on(){return on;}};
+  document.addEventListener('visibilitychange',()=>{ if(!ctx) return; if(document.hidden) ctx.suspend(); else go(); });
+  return {init,go,mute,unmute,setDepth,level,get wanted(){return want;}};
 })();
-const sndBtn=$('#snd');
-function setSound(want){
-  const ok=want?music.enable():(music.disable(),true);
-  sndBtn.setAttribute('aria-pressed',String(!!(want&&ok)));
-}
-sndBtn.addEventListener('click',()=>setSound(sndBtn.getAttribute('aria-pressed')!=='true'));
-setTimeout(()=>music.init(),400); // decode ahead of time so sound starts the moment someone enters
+music.init();
+// the first tap, click or key press anywhere starts the sound if the browser held it back
+const UNLOCK=['pointerdown','pointerup','touchend','keydown','click'];
+const unlock=()=>music.go();
+UNLOCK.forEach(t=>addEventListener(t,unlock,{capture:true,passive:true}));
+
+const hush=$('#hush'), hushTip=$('#hushTip'), wavePath=$('#wave');
+function syncHush(){ const muted=!music.wanted; hush.setAttribute('aria-pressed',String(muted)); hushTip.textContent=muted?'Listen':'Hush'; }
+hush.addEventListener('click',()=>{ if(music.wanted) music.mute(); else music.unmute(); syncHush(); });
+syncHush();
+setTimeout(()=>hush.classList.add('is-on'),900);
 
 /* ---------- scroll ---------- */
 const maxScroll=()=>Math.max(1,document.documentElement.scrollHeight-innerHeight);
@@ -369,6 +355,7 @@ function goEnd(focus){
   if(focus) setTimeout(()=>{ if(!box.classList.contains('is-done')) emailEl.focus({preventScroll:true}); }, reduceMotion?60:1500);
 }
 jumpBtn.addEventListener('click',()=>goEnd(true));
+$('#skip').addEventListener('click',(e)=>{e.preventDefault();goEnd(true);});
 $('#toTop').addEventListener('click',(e)=>{e.preventDefault();scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});});
 const tilt=$('#tilt');
 box.addEventListener('pointermove',(e)=>{ const r=box.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
@@ -377,42 +364,25 @@ box.addEventListener('pointermove',(e)=>{ const r=box.getBoundingClientRect(); c
 box.addEventListener('pointerleave',()=>{ tilt.style.setProperty('--rx','0deg'); tilt.style.setProperty('--ry','0deg'); });
 box.addEventListener('focusin',()=>{ if(pT<0.9) scrollTo({top:maxScroll()}); });
 
-/* ---------- entry gate ---------- */
-const gate=$('#gate'), bar=$('#bar');
-let entered=false, enteredAt=0;
-bar.inert=true; box.inert=true;
-function enter(withSound){
-  if(entered) return; entered=true; enteredAt=performance.now();
-  setSound(!!withSound);
-  gate.classList.add('is-gone'); gate.setAttribute('aria-hidden','true'); gate.inert=true;
-  document.documentElement.classList.remove('gated'); bar.inert=false; box.inert=false;
-  if(document.activeElement&&gate.contains(document.activeElement)) document.activeElement.blur();
-}
-$('#enterSound').addEventListener('click',()=>enter(true));
-$('#enterQuiet').addEventListener('click',()=>enter(false));
-gate.addEventListener('keydown',(e)=>{ if(e.key==='Escape') enter(false); });
-$('#skip').addEventListener('click',(e)=>{ e.preventDefault(); enter(false); goEnd(true); });
-$('#enterSound').focus({preventScroll:true});
-
 /* ---------- countdown ---------- */
 const dropAt=Date.parse(DROP_AT);
 const CU={d:$('#cd'),h:$('#ch'),m:$('#cm'),s:$('#cs')};
-const dial=$('#dial'), liveEl=$('#live'), barT=$('#barT'), gateT=$('#gateT'), backWhen=$('#backWhen');
+const dial=$('#dial'), liveEl=$('#live'), barT=$('#barT'), backWhen=$('#backWhen');
 const pad=(n)=>String(n).padStart(2,'0');
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
 let lastLabel='';
 function tickClock(){
-  if(!Number.isFinite(dropAt)){ $('#clock').hidden=true; barClock.hidden=true; $('#gateClock').hidden=true; backWhen.hidden=true; console.warn('RUMOAR: DROP_AT is not a valid date'); return; }
+  if(!Number.isFinite(dropAt)){ $('#clock').hidden=true; barClock.hidden=true; backWhen.hidden=true; console.warn('RUMOAR: DROP_AT is not a valid date'); return; }
   const ms=dropAt-Date.now();
   if(ms<=0){
     dial.hidden=true; liveEl.hidden=false;
-    barClock.textContent='The first drop is out now'; $('#gateClock').textContent='The first drop is out now.'; backWhen.textContent='The first drop is out now.';
+    barClock.textContent='The first drop is out now'; backWhen.textContent='The first drop is out now.';
     return;
   }
   const t=Math.floor(ms/1000), d=Math.floor(t/86400), h=Math.floor(t%86400/3600), m=Math.floor(t%3600/60), s=t%60;
   CU.d.textContent=pad(d); CU.h.textContent=pad(h); CU.m.textContent=pad(m); CU.s.textContent=pad(s);
   const short=d+'d '+pad(h)+':'+pad(m)+':'+pad(s);
-  barT.textContent=short; gateT.textContent=short;
+  barT.textContent=short;
   const label=plural(d,'day')+', '+plural(h,'hour')+' and '+plural(m,'minute');
   if(label!==lastLabel){
     lastLabel=label;
@@ -485,10 +455,9 @@ form.addEventListener('submit',async(e)=>{
 
 /* ---------- frames ---------- */
 const N=FRAMES.length, imgs=new Array(N), ready=new Uint8Array(N);
-let dirty=true, loadedCount=0;
-const gateLoad=$('#gateLoad');
+let dirty=true;
 function loadOne(i){ return new Promise(res=>{ const im=new Image(); im.decoding='async';
-  const done=()=>{ loadedCount++; gateLoad.style.transform='scaleX('+(loadedCount/N).toFixed(3)+')'; res(); };
+  const done=()=>res();
   im.onload=()=>{ imgs[i]=im; ready[i]=1; dirty=true; done(); }; im.onerror=()=>{ console.warn('RUMOAR: frame failed to load',i); done(); }; im.src=FRAMES[i]; }); }
 async function loadAll(){
   await loadOne(0); loadOne(N-1);
@@ -652,9 +621,21 @@ let pointerSeen=false; const lightT=[.5,.5], light=[.5,.5];
 addEventListener('pointermove',(e)=>{ if(e.pointerType!=='mouse') return; pointerSeen=true; lightT[0]=e.clientX/innerWidth; lightT[1]=1-e.clientY/innerHeight; },{passive:true});
 let env=0, envAvg=0.25, breath=0.5;
 
+/* ---------- the hush waveform ---------- */
+let waveAmp=0, wavePhase=0, waveLast='';
+function drawWave(dt,lv){
+  const target=lv>=0?(reduceMotion?2.5:1.6+clamp((lv-0.15)*2.4)*6.5):0;
+  waveAmp+=(target-waveAmp)*Math.min(1,dt*(target>waveAmp?6:5));
+  if(!reduceMotion) wavePhase+=dt*(2.2+(lv>0?lv*5:0));
+  let d='M3 14';
+  if(waveAmp>0.04){ d=''; for(let x=3;x<=25;x+=1){ const t=(x-3)/22, y=14+waveAmp*Math.sin(Math.PI*t)*Math.sin(t*11-wavePhase); d+=(x===3?'M':'L')+x+' '+y.toFixed(2); } }
+  else d='M3 14H25';
+  if(d!==waveLast){ wavePath.setAttribute('d',d); waveLast=d; }
+}
+
 /* ---------- loop ---------- */
 const FRAME_END=0.82, LIVE_MS=33; // smoke, grain and breath refresh ~30fps
-let last=performance.now(), lastKey='', lastLive=0;
+let last=performance.now(), lastKey='', lastLive=0, litAt=0;
 function frame(now){
   requestAnimationFrame(frame);
   const dt=Math.min(0.05,(now-last)/1000); last=now;
@@ -670,8 +651,9 @@ function frame(now){
   light[0]+=(lightT[0]-light[0])*Math.min(1,dt*2.5); light[1]+=(lightT[1]-light[1])*Math.min(1,dt*2.5);
   music.setDepth(smooth(0.02,0.9,p));
 
-  // lights are almost off behind the gate, then come up when someone steps in
-  const intro=entered?lerp(0.18,1,ease(clamp((now-enteredAt)/(reduceMotion?300:2600)))):0.18;
+  // lights come up on their own when the page opens
+  if(!litAt&&ready[0]) litAt=now;
+  const intro=litAt?lerp(0.08,1,ease(clamp((now-litAt)/(reduceMotion?200:2400)))):0.08;
 
   const f=clamp(p/FRAME_END)*(N-1), fN=f/(N-1);
   let a=Math.floor(f), b=Math.min(N-1,a+1), m=f-a;
@@ -700,6 +682,8 @@ function frame(now){
   if(ba<0.05) box.classList.remove('shine');
   box.style.visibility=ba<0.01?'hidden':'visible'; box.style.pointerEvents=ba>0.5?'auto':'none';
   box.style.transform='translate(-50%,'+lerp(-44,-50,ease(ba)).toFixed(2)+'%) scale('+lerp(0.97,1,ease(ba)).toFixed(4)+')';
+  drawWave(dt,lv);
+  hush.style.setProperty('--glow',music.wanted&&lv>=0?breath.toFixed(3):'0');
   const topA=(1-ba).toFixed(3);
   jumpBtn.style.opacity=topA; barClock.style.opacity=topA;
   jumpBtn.style.visibility=ba>0.98?'hidden':'visible';
